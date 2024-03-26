@@ -57,6 +57,11 @@ export default function PostPage() {
         <Spinner size='xl' />
       </div>
     );
+    const styles = {
+      padding: '0.25rem', // Example padding
+      width: '30.75rem', // Example width
+      // Add more styles as needed
+    };
   return (
     <main className='p-3 flex flex-col max-w-6xl mx-auto min-h-screen'>
       <h1 className='text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl'>
@@ -85,6 +90,13 @@ export default function PostPage() {
         className='p-3 max-w-2xl mx-auto w-full post-content'
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
+      <img
+        src={post && post.image2}
+        alt={post && post.title}
+        className='mt-6 p-1 max-h-[400px] w-11 object-fit'
+        style={styles}
+        
+      />
       
       <CommentSection postId={post._id} />
 

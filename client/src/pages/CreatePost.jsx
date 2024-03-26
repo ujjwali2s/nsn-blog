@@ -21,7 +21,42 @@ export default function CreatePost() {
   const [publishError, setPublishError] = useState(null);
 
   const navigate = useNavigate();
-
+  const handleUpdloadImage2 = async () => {
+    try {
+      if (!file) {
+        setImageUploadError('Please select an image');
+        return;
+      }
+      setImageUploadError(null);
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + '-' + file.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setImageUploadProgress(progress.toFixed(0));
+        },
+        (error) => {
+          setImageUploadError('Image upload failed');
+          setImageUploadProgress(null);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setImageUploadProgress(null);
+            setImageUploadError(null);
+            setFormData({ ...formData, image: downloadURL ,image2:downloadURL});
+          });
+        }
+      );
+    } catch (error) {
+      setImageUploadError('Image upload failed');
+      setImageUploadProgress(null);
+      console.log(error);
+    }
+  };
   const handleUpdloadImage = async () => {
     try {
       if (!file) {
@@ -151,6 +186,37 @@ export default function CreatePost() {
             setFormData({ ...formData, content: value });
           }}
         />
+        <FileInput
+            type='file'
+            accept='image/*'
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+         <Button
+            type='button'
+            gradientDuoTone='purpleToBlue'
+            size='sm'
+            outline
+            onClick={handleUpdloadImage2}
+            disabled={imageUploadProgress}
+          >
+            {imageUploadProgress ? (
+              <div className='w-16 h-16'>
+                <CircularProgressbar
+                  value={imageUploadProgress}
+                  text={`${imageUploadProgress || 0}%`}
+                />
+              </div>
+            ) : (
+              'Upload Image'
+            )}
+          </Button>
+          {formData.image && (
+          <img
+            src={formData.image2}
+            alt='upload'
+            className='w-full h-72 object-cover'
+          />
+        )}
         
         <Button type='submit' gradientDuoTone='purpleToPink'>
           Publish
